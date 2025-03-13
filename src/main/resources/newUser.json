@@ -1,0 +1,14 @@
+{
+  "name": "John Smith",
+  "username": "Johns",
+  "email": "gsm@mail.com",
+  "address": {
+    "street": "Cl. de Ayala",
+    "suite": "73",
+    "city": "Madrid",
+    "geo": {
+      "lat": "40.415448974486914",
+      "lng": "-3.7011686448785674"
+    }
+  }
+}

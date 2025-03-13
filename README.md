@@ -18,7 +18,7 @@ The App must contain methods for realizing the next functionality:
 Add a new method that will print all comments until the selected user's last post and write them to file.
 The file must be called `user-X-post-Y-comments.json`, where Х - user's `id`, Y - post number.
 
-https://jsonplaceholder.typicode.com/users/1/posts The last post has the highest `id`.
+https://jsonplaceholder.typicode.com/users/1/posts - The last post has the highest `id`.
 https://jsonplaceholder.typicode.com/posts/10/comments
 
 ## TASK 3
