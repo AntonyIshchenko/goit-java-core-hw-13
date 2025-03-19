@@ -1,3 +1,9 @@
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -72,6 +78,78 @@ public class App {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(baseURL + "/users/"+id))
                 .DELETE()
+                .build();
+
+        return processResponse(request);
+    }
+
+    // TASK 2
+    public String saveAllCommentsToUsersLastPost(int id){
+        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+
+        // Step 1: get posts array
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseURL + "/users/"+id+"/posts"))
+                .build();
+
+        String response = processResponse(request);
+        if (response.equals("Error getting data!")) return response;
+
+        // Step 2: get max postId
+        Gson gson = new Gson();
+        JsonArray array = gson.fromJson(response, JsonArray.class);
+
+        if (array.isEmpty()) return "No data to write to the file!";
+
+        int maxPostId = -1;
+        for (JsonElement element:array){
+            JsonObject post = element.getAsJsonObject();
+            int postId = post.get("id").getAsInt();
+
+            if (postId > maxPostId) {
+                maxPostId = postId;
+            }
+        }
+
+        // Step 3: get comments to max postId
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(baseURL + "/posts/"+id+"/comments"))
+                .build();
+
+        response = processResponse(request);
+        if (response.equals("Error getting data!")) return response;
+
+        // Step 4: write to the file
+        String fileName = "user-"+id+"-post-"+ maxPostId +"-comments.json";
+        File file = new File(fileName);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(response);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error writing data to the file!";
+        }
+
+        return "Data is successfully written to the file "+ fileName;
+    }
+
+    // TASK 3
+    public String getAllTasksByUser(int id ){
+        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseURL + "/users/"+id+"/todos"))
+                .build();
+
+        return processResponse(request);
+    }
+
+    // TASK 3
+    public String getAllTasksByUser(int id, boolean isOpen){
+        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseURL + "/users/"+id+"/todos?completed="+isOpen))
                 .build();
 
         return processResponse(request);

@@ -30,10 +30,12 @@ public class AppTest {
 
         System.out.println("********************************************");
         System.out.println("TASK 2 TEST:");
+        System.out.println("saveAllCommentsToUsersLastPost(1) = " + testApp.saveAllCommentsToUsersLastPost(1));
         System.out.println("********************************************");
 
         System.out.println("********************************************");
         System.out.println("TASK 3 TEST:");
+        System.out.println("getAllTasksByUser(1,false) = " + testApp.getAllTasksByUser(1, false));
         System.out.println("********************************************");
     }
 
