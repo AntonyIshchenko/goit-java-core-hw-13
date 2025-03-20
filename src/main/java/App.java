@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,22 +14,26 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 public class App {
-    private HttpClient client = HttpClient.newHttpClient();
-    private String baseURL = "https://jsonplaceholder.typicode.com";
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     // TASK 1
     public String getAllUsers() {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(baseURL + "/users")).build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/users"))
+                .build();
 
-        return  processResponse(request);
+        return processResponse(request);
     }
 
     // TASK 1
     public String getUserById(int id) {
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/" + id))
+                .uri(URI.create(BASE_URL + "/users/" + id))
                 .build();
 
         return processResponse(request);
@@ -36,22 +41,26 @@ public class App {
 
     // TASK 1
     public String getUsersByName(String username) {
-        if (username.isEmpty()) return "Invalid username. Username must be not empty string";
+        if (username == null || username.isEmpty()) {
+            return "Invalid username. Username must be not empty string";
+        }
 
         String encodedValue = URLEncoder.encode(username, StandardCharsets.UTF_8);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users?username=" + encodedValue))
+                .uri(URI.create(BASE_URL + "/users?username=" + encodedValue))
                 .build();
 
         return processResponse(request);
     }
 
     // TASK 1
-    public String createNewUser(String data){
-        if (data == null || data.isEmpty()) return "Invalid data";
+    public String createNewUser(String data) {
+        if (data == null || data.isEmpty()) {
+            return "Invalid data";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users"))
+                .uri(URI.create(BASE_URL + "/users"))
                 .POST(HttpRequest.BodyPublishers.ofString(data))
                 .build();
 
@@ -59,12 +68,16 @@ public class App {
     }
 
     // TASK 1
-    public String updateUser(int id, String data){
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
-        if (data == null || data.isEmpty()) return "Invalid data";
+    public String updateUser(int id, String data) {
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
+        if (data == null || data.isEmpty()) {
+            return "Invalid data";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/"+id))
+                .uri(URI.create(BASE_URL + "/users/" + id))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(data))
                 .build();
 
@@ -72,11 +85,13 @@ public class App {
     }
 
     // TASK 1
-    public String deleteUser(int id){
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+    public String deleteUser(int id) {
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/"+id))
+                .uri(URI.create(BASE_URL + "/users/" + id))
                 .DELETE()
                 .build();
 
@@ -84,12 +99,14 @@ public class App {
     }
 
     // TASK 2
-    public String saveAllCommentsToUsersLastPost(int id){
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+    public String saveAllCommentsToUsersLastPost(int id) {
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
 
         // Step 1: get posts array
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/"+id+"/posts"))
+                .uri(URI.create(BASE_URL + "/users/" + id + "/posts"))
                 .build();
 
         String response = processResponse(request);
@@ -102,7 +119,7 @@ public class App {
         if (array.isEmpty()) return "No data to write to the file!";
 
         int maxPostId = -1;
-        for (JsonElement element:array){
+        for (JsonElement element : array) {
             JsonObject post = element.getAsJsonObject();
             int postId = post.get("id").getAsInt();
 
@@ -113,43 +130,44 @@ public class App {
 
         // Step 3: get comments to max postId
         request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/posts/"+id+"/comments"))
+                .uri(URI.create(BASE_URL + "/posts/" + id + "/comments"))
                 .build();
 
         response = processResponse(request);
-        if (response.equals("Error getting data!")) return response;
+        if (response.equals("Error getting data!")) {
+            return response;
+        }
 
         // Step 4: write to the file
-        String fileName = "user-"+id+"-post-"+ maxPostId +"-comments.json";
-        File file = new File(fileName);
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(response);
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        String fileName = "user-" + id + "-post-" + maxPostId + "-comments.json";
+        if (!writeFile(fileName, response)) {
             return "Error writing data to the file!";
         }
 
-        return "Data is successfully written to the file "+ fileName;
+        return "Data is successfully written to the file " + fileName;
     }
 
     // TASK 3
-    public String getAllTasksByUser(int id ){
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+    public String getAllTasksByUser(int id) {
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/"+id+"/todos"))
+                .uri(URI.create(BASE_URL + "/users/" + id + "/todos"))
                 .build();
 
         return processResponse(request);
     }
 
     // TASK 3
-    public String getAllTasksByUser(int id, boolean isOpen){
-        if ( id<1 ) return "Invalid id. Id must be greater then zero";
+    public String getAllTasksByUser(int id, boolean isOpen) {
+        if (id < 1) {
+            return "Invalid id. Id must be greater then zero";
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseURL + "/users/"+id+"/todos?completed="+isOpen))
+                .uri(URI.create(BASE_URL + "/users/" + id + "/todos?completed=" + isOpen))
                 .build();
 
         return processResponse(request);
@@ -157,11 +175,10 @@ public class App {
 
     private String processResponse(HttpRequest request) {
         try {
-            HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             int statusCode = response.statusCode();
-            if (statusCode >= 200 && statusCode <300 ) {
+            if (statusCode >= 200 && statusCode < 300) {
                 return response.body();
             } else {
                 throw new InterruptedException("Error getting data!");
@@ -170,5 +187,17 @@ public class App {
             e.printStackTrace();
             return "Error getting data!";
         }
+    }
+
+    private boolean writeFile(String fileName, String text) {
+        File file = new File(fileName);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(text);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }
