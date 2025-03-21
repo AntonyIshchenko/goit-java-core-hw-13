@@ -1,5 +1,3 @@
-import java.io.File;
-import java.util.Scanner;
 
 public class AppTest {
 
@@ -21,10 +19,10 @@ public class AppTest {
         System.out.println("********************************************");
         System.out.println("deleteUser(1) = " + testApp.deleteUser(1));
         System.out.println("********************************************");
-        String newUserData = getFileContent("./src/main/resources/newUser.json");
+        String newUserData = FileReader.getFileContent("./src/main/resources/newUser.json");
         System.out.println("createNewUser(newUser.json) = " + testApp.createNewUser(newUserData));
         System.out.println("********************************************");
-        String updateUserData = getFileContent("./src/main/resources/updateUser.json");
+        String updateUserData = FileReader.getFileContent("./src/main/resources/updateUser.json");
         System.out.println("updateUser(1,newUser.json) = " + testApp.updateUser(1, updateUserData));
         System.out.println("********************************************");
 
@@ -39,32 +37,4 @@ public class AppTest {
         System.out.println("********************************************");
     }
 
-    private static String getFileContent(String filePath) {
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            System.out.println("File not found! Can't do task!");
-            return null;
-        }
-
-        if (file.isDirectory()) {
-            System.out.println("File is a directory! Can't do task!");
-            return null;
-        }
-
-        StringBuilder result = new StringBuilder();
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNext()) {
-                result.append(scanner.nextLine());
-            }
-
-            return result.toString();
-
-        } catch (Exception ex) {
-            System.out.println("Error while reading file:");
-            ex.printStackTrace();
-            return null;
-        }
-
-    }
 }

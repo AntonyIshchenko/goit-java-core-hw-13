@@ -14,8 +14,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 public class App {
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     // TASK 1
     public String getAllUsers() {
@@ -175,7 +175,7 @@ public class App {
 
     private String processResponse(HttpRequest request) {
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             int statusCode = response.statusCode();
             if (statusCode >= 200 && statusCode < 300) {
